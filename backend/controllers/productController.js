@@ -122,7 +122,7 @@ exports.createProductReview = catchAsyncErrors(async(req, res, next) => {
     })
   } else {
     product.reviews.push(review);
-    product.numOfReviews = product.review.length;
+    product.numOfReviews = product.reviews.length;
   }
 
   // Calculate overall rating
@@ -130,12 +130,12 @@ exports.createProductReview = catchAsyncErrors(async(req, res, next) => {
 
   await product.save({ validateBeforeSave: false });
 
-  res.status(201).json({
+  res.status(200).json({
     success: true
   });
 });
 
-// Get Product Reviews => /api/v1/reviews
+// Get Product Reviews => /api/v1/reviews?id={product._id}
 exports.getProductReviews = catchAsyncErrors(async (req, res, next) => {
   const product = await Product.findById(req.query.id);
 
@@ -145,7 +145,7 @@ exports.getProductReviews = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// Delete Product Review => /api/v1/reviews
+// Delete Product Review => /api/v1/reviews?productId=60ee94b7896503441829b00b&id=60f41eb49fbc6766f80f6627
 exports.deleteReview = catchAsyncErrors(async (req, res, next) => {
   const product = await Product.findById(req.query.productId);
 
@@ -155,7 +155,7 @@ exports.deleteReview = catchAsyncErrors(async (req, res, next) => {
 
   const ratings = product.reviews.reduce((acc, item) => item.rating + acc, 0) / reviews.length;
 
-  await Product.findByIdAndUpdate(req.query.id, {
+  await Product.findByIdAndUpdate(req.query.productId, {
     reviews,
     ratings,
     numOfReviews
@@ -165,7 +165,7 @@ exports.deleteReview = catchAsyncErrors(async (req, res, next) => {
     useFindAndModify: false
   });
 
-  res.status(201).json({
+  res.status(200).json({
     success: true
   });
 });
